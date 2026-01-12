@@ -6,7 +6,7 @@ class Order:
         client_name,
         quantity_required,
         quantity_completed = 0,
-        tailors_involved = {}   # dict: tailor_id -> pieces completed
+        tailors_involved = None
     ):
         self.id = id
         self.product_name = product_name
@@ -19,7 +19,7 @@ class Order:
     def status(self):
         if self.quantity_completed >= self.quantity_required:
             return "Complete"
-        elif self.tailors_involved == {}:
+        elif self.tailors_involved == None:
             return "Unassigned"
         else:
             return "In progress"

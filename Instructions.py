@@ -15,3 +15,9 @@ if  "current_order" not in st.session_state:
 
 if "ml_suggestion" not in st.session_state:
     st.session_state.ml_suggestion = {}
+
+if "manual_selected_tailors" not in st.session_state:
+    st.session_state.selected_tailors = set()
+
+if "quantity_allocation" not in st.session_state:
+    st.session_state.quantity_allocation = {}

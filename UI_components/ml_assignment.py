@@ -5,7 +5,27 @@ from utils.helpers import commit_assignment
 def assign_ml_dialog(order):
     st.subheader("Recommended Tailors")
 
-    allocation = {}
+    tailors = st.session_state.tailors
+
+    available_tailors = [t for t in tailors if t.current_workload < t.max_capacity]
+
+    for tailor in available_tailors:
+        with st.expander(f"{tailor.name}", expanded=False):
+
+            col1, col2 = st.columns([3, 1])
+
+            with col1:
+                st.write("**Skills**")
+                for skill, level in tailor.skill_vector.items():
+                    st.progress(level, text=skill)
+
+                st.write(f"Reliability: {tailor.reliability_score}")
+                st.write(
+                    f"Workload: {tailor.current_workload}/{tailor.max_capacity}"
+                )
+                st.write(f"Availability: {tailor.availability_hours} hrs")
+        st.session_state.selected_tailors.add(tailor.id)
+
 
     '''
     for tailor, score in st.session_state.ml_suggestion:
@@ -24,11 +44,12 @@ def assign_ml_dialog(order):
     
     with col1:
         if st.button("Accept"):
-            commit_assignment(order, allocation)
+            st.session_state.assignment_mode = "QTY"
             st.rerun()
 
     with col2:
         if st.button("Reject & Choose Manually"):
+            st.session_state.selected_tailors.clear()
             st.session_state.assignment_mode = "MANUAL"
             st.rerun()
             

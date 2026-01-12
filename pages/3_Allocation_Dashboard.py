@@ -1,8 +1,8 @@
 import streamlit as st
 from UI_components.order_card import render_order_card
-from UI_components.tailor_card import render_tailor_card
 from UI_components.ml_assignment import assign_ml_dialog
 from UI_components.manual_assignment import assign_manual_dialog
+from UI_components.quantity_assignment import assign_quantity_dialog
 
 orders = st.session_state.orders
 
@@ -25,8 +25,10 @@ if st.session_state.assignment_mode == "ML":
     assign_ml_dialog(st.session_state.current_order)
 
 elif st.session_state.assignment_mode == "MANUAL":
-    st.session_state.assignment_mode = None
     assign_manual_dialog(st.session_state.current_order)
+
+elif st.session_state.assignment_mode == "QTY":
+    assign_quantity_dialog(st.session_state.current_order)
 
 
 
