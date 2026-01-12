@@ -1,6 +1,8 @@
 import streamlit as st
 from UI_components.order_card import render_order_card
 from utils.helpers import add_order
+from UI_components.ml_assignment import assign_ml_dialog
+from UI_components.manual_assignment import assign_manual_dialog
 
 st.title("Orders")
 
@@ -12,7 +14,7 @@ tailor_lookup = {tailor.id: tailor for tailor in tailors}
 
 @st.dialog("Enter details of new order")
 def new_order():
-    product_name = st.text_input("Product Name")
+    product_name = st.selectbox("Product Name", ["School Uniform"], index=None, placeholder="Select a product or enter a new one", accept_new_options=True)
     client_name = st.text_input("Client Name")
     quantity_required = st.number_input("Quantity Required", min_value=1, step=1)
     if st.button("Submit"):
@@ -26,10 +28,11 @@ with col4:
     if st.button(label = "+ New Order", type = "primary"):
         new_order()
 
-status_filter = st.multiselect(
-    "Filter by status",
-    options=["Unassigned", "In progress", "Completed"],
-    default=["Unassigned", "In progress", "Completed"],
+status_filter = st.selectbox(
+    "Filter by Order Status",
+    ("Unassigned", "In progress", "Completed"),
+    placeholder="Click here to filter by order type...",
+    accept_new_options=False
 )
 
 filtered_orders = [
@@ -39,3 +42,11 @@ filtered_orders = [
 
 for order in filtered_orders:
     render_order_card(order, tailor_lookup)
+
+if st.session_state.assignment_mode == "ML":
+    st.session_state.assignment_mode = None
+    assign_ml_dialog(st.session_state.current_order)
+
+elif st.session_state.assignment_mode == "MANUAL":
+    st.session_state.assignment_mode = None
+    assign_manual_dialog(st.session_state.current_order)
