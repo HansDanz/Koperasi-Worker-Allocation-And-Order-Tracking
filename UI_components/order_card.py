@@ -11,6 +11,8 @@ def render_order_card(order, tailor_lookup):
         with col1:
             st.write("**Information**")
             st.write(f"Client: {order.client_name}")
+            st.write(f"Placement Date: {order.placement_date}")
+            st.write(f"Due Date: {order.due_date}")
 
         with col2:
             st.write("**Progress**")

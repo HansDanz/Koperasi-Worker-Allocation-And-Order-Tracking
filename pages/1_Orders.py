@@ -4,6 +4,7 @@ from utils.helpers import add_order
 from UI_components.ml_assignment import assign_ml_dialog
 from UI_components.manual_assignment import assign_manual_dialog
 from UI_components.quantity_assignment import assign_quantity_dialog
+import datetime
 
 st.title("Orders")
 
@@ -18,8 +19,10 @@ def new_order():
     product_name = st.selectbox("Product Name", ["School Uniform"], index=None, placeholder="Select a product or enter a new one", accept_new_options=True)
     client_name = st.text_input("Client Name")
     quantity_required = st.number_input("Quantity Required", min_value=1, step=1)
+    placement_date=datetime.date.today()
+    due_date = st.date_input("Due Date")
     if st.button("Submit"):
-        add_order(product_name, client_name, quantity_required)
+        add_order(product_name, client_name, quantity_required, placement_date, due_date)
         st.success("Order added")
         st.rerun()
 
@@ -31,14 +34,17 @@ with col4:
 
 status_filter = st.selectbox(
     "Filter by Order Status",
-    ("Unassigned", "In progress", "Completed"),
+    ("All", "Unassigned", "In progress", "Completed"),
     placeholder="Click here to filter by order type...",
     accept_new_options=False
 )
 
-filtered_orders = [
+if status_filter == "All":
+    filtered_orders = orders
+else:
+    filtered_orders = [
     order for order in orders
-    if order.status in status_filter
+    if order.status == status_filter
 ]
 
 for order in filtered_orders:
