@@ -19,7 +19,7 @@ def generate_tailors(count=50):
     for i in range(1, count + 1):
         first = random.choice(names)
         last = random.choice(family_names)
-        fullname = f"Ibu {first} {last}" if i % 2 == 0 else f"Ibu {first}"
+        fullname = f"{first} {last}" if i % 2 == 0 else f"{first}"
         
         # Skills
         raw_skills = ["SEWING", "CUTTING", "QC", "PACKING"]

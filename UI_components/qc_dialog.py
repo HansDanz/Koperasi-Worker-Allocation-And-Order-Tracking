@@ -44,9 +44,11 @@ def update_progress_dialog(order, tailor_lookup):
             if isinstance(data, int):
                 assigned = data
                 completed = 0
+                picked_up = False
             else:
                 assigned = data.get("assigned", 0)
                 completed = data.get("completed", 0)
+                picked_up = data.get("picked_up", False)
             
             remaining = assigned - completed
             
@@ -56,7 +58,9 @@ def update_progress_dialog(order, tailor_lookup):
             cols[1].caption(f"Completed: {completed}")
             
             # Input for NEWLY completed items
-            if remaining > 0:
+            if not picked_up:
+                 cols[2].caption("⚠️ Waiting for Pickup")
+            elif remaining > 0:
                 val = cols[2].number_input(
                     f"Add Completed (Max {remaining})", 
                     min_value=0, 
