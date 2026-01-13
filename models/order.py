@@ -27,7 +27,9 @@ class Order:
         current_status = "DRAFT",
         start_date = None,
         budget = 0,
-        actual_cost = 0
+        actual_cost = 0,
+        clothes_category = None,
+        clothes_type = None
     ):
         self.id = id
         self.product_name = product_name
@@ -38,6 +40,10 @@ class Order:
         self.unit_price = unit_price # Worker Wage per piece
         self.deadline_date = deadline_date
         self.complexity_score = complexity_score
+        
+        # New attributes
+        self.clothes_category = clothes_category
+        self.clothes_type = clothes_type
         
         # Financials
         self.budget = budget
@@ -93,6 +99,21 @@ class Order:
         elif isinstance(data, dict):
             return data.get("assigned", 0), data.get("completed", 0), data.get("picked_up", False)
         return 0, 0, False
+
+    def get_tailor_stats(self, tailor_id):
+        """
+        Returns a dict of extra stats (days_needed, hours_per_piece) for a given tailor.
+        """
+        if not self.tailors_involved or tailor_id not in self.tailors_involved:
+            return {}
+        
+        data = self.tailors_involved[tailor_id]
+        if isinstance(data, dict):
+             return {
+                 "days_needed": data.get("days_needed"),
+                 "hours_per_piece": data.get("hours_per_piece")
+             }
+        return {}
 
     def confirm_pickup(self, tailor_id):
         """

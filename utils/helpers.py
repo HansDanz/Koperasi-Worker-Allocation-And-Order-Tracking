@@ -2,7 +2,7 @@ import streamlit as st
 from models.order import Order
 from models.tailor import Tailor
 
-def add_order(product_name, client_name, quantity_required, budget=0, wage_per_piece=0, deadline=None):
+def add_order(product_name, client_name, quantity_required, budget=0, wage_per_piece=0, deadline=None, clothes_category=None, clothes_type=None):
     new_id = max(order.id for order in st.session_state.orders) + 1
 
     new_order = Order(
@@ -12,7 +12,9 @@ def add_order(product_name, client_name, quantity_required, budget=0, wage_per_p
         quantity_required=quantity_required,
         budget=budget,
         unit_price=wage_per_piece,
-        deadline_date=deadline
+        deadline_date=deadline,
+        clothes_category=clothes_category,
+        clothes_type=clothes_type
     )
 
     st.session_state.orders.append(new_order)

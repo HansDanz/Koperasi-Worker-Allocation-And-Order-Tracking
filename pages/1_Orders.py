@@ -25,7 +25,19 @@ tailor_lookup = {tailor.id: tailor for tailor in tailors}
 # Dialog for new order
 @st.dialog("Enter details of new order")
 def new_order():
-    product_name = st.selectbox("Product Name", ["School Uniform", "Batik Shirt", "Sports Jersey"], index=None, placeholder="Select or type...", accept_new_options=True)
+    clothes_type = st.selectbox("Type", [
+        "PDH", "T-Shirts", "Graduation Uniform", "Jersey", 
+        "Uniform Shirt", "Boyscout Uniform Shirt", "Uniform Skirt", 
+        "Boyscout Uniform Skirt", "Elementary Uniform", "Senior High School", 
+        "Cuttlepack", "Modest Uniform", "Jacket"
+    ], index=0)
+
+    if clothes_type in ["Uniform Shirt", "Boyscout Uniform Shirt", "Uniform Skirt", "Boyscout Uniform Skirt", "Elementary Uniform", "Senior High School"]:
+        clothes_category = "Uniform"
+    else:
+        clothes_category = "Custom"
+
+    product_name = st.text_input("Product Name", placeholder="e.g. Red PDH Shirt")
     client_name = st.text_input("Client Name")
     quantity_required = st.number_input("Quantity Required", min_value=1, step=1)
     deadline = st.date_input("Deadline")
@@ -36,7 +48,11 @@ def new_order():
     
     if st.button("Submit"):
         # Create order properly
-        add_order(product_name, client_name, quantity_required, budget=budget, wage_per_piece=wage, deadline=deadline) 
+        add_order(
+            product_name, client_name, quantity_required, 
+            budget=budget, wage_per_piece=wage, deadline=deadline,
+            clothes_category=clothes_category, clothes_type=clothes_type
+        ) 
         # Since add_order might not set deadline, we might want to update the last added order
         # But for now let's rely on defaults or update helper later
         st.success("Order added")
@@ -95,10 +111,32 @@ if "detail_order_id" in st.session_state and st.session_state.detail_order_id is
             st.rerun()
 else:
     # List View
+    # Search Bar
+    search_query = st.text_input("Search Orders", placeholder="Search by Project Name or ID", label_visibility="collapsed")
+
+    # Filter Logic (using the existing filter_option from the selectbox)
+    if filter_option == "All":
+        filtered_orders = orders
+    else:
+        allowed_statuses = status_map.get(filter_option, [])
+        filtered_orders = [o for o in orders if o.status in allowed_statuses]
+
+    # Apply Search
+    if search_query:
+        search_query = search_query.lower()
+        filtered_orders = [
+            o for o in filtered_orders 
+            if search_query in o.product_name.lower() or str(o.id) in search_query
+        ]
+
+    # Sort by ID Ascending (Smallest ID = Newest Date logic applied in data gen)
+    filtered_orders.sort(key=lambda x: x.id)
+
     if not filtered_orders:
-        st.info(f"No orders found in '{filter_option}'")
+        st.info(f"No orders found matching your criteria.")
     else:
         for order in filtered_orders:
+            # Pass tailor lookup if needed, though card handles its own
             render_order_card(order, tailor_lookup)
 
 # Assignment Dialogs Logic

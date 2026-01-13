@@ -65,6 +65,12 @@ def render_order_detail(order, tailor_lookup):
         st.metric("Status", order.status)
         st.metric("Deadline", str(order.deadline_date))
         st.caption(f"Budget: IDR {getattr(order, 'budget', 0):,.0f}")
+        
+        # Clothes Attributes
+        cat = getattr(order, 'clothes_category', '-') or '-'
+        typ = getattr(order, 'clothes_type', '-') or '-'
+        st.write(f"**{cat}** • {typ}")
+
         actual_cost = getattr(order, 'actual_cost', 0)
         if actual_cost > 0:
              st.caption(f"Actual Cost: **IDR {actual_cost:,.0f}**")
@@ -118,6 +124,15 @@ def render_order_detail(order, tailor_lookup):
                 with c2:
                     st.write(f"Target: {assigned}")
                     st.write(f"Done: {completed}")
+                    
+                    # Display History Stats if available
+                    stats = order.get_tailor_stats(tailor_id)
+                    days = stats.get("days_needed")
+                    hours = stats.get("hours_per_piece")
+                    
+                    if days is not None or hours is not None:
+                         st.caption(f"⏱️ {hours or '?'} hr/pc | 📅 {days or '?'} days")
+
                     # Visual bar
                     if assigned > 0:
                         st.progress(completed/assigned)

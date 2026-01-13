@@ -1,5 +1,5 @@
 class Tailor:
-    def __init__(self, id, name, skill_vector, reliability_score, max_capacity, current_workload, availability_hours, employed_since):
+    def __init__(self, id, name, skill_vector, reliability_score, max_capacity, current_workload, availability_hours, employed_since, age=None, phone=None, address=None):
         self.id = id
         self.name = name
         self.skill_vector = skill_vector
@@ -8,6 +8,11 @@ class Tailor:
         self.current_workload = current_workload
         self.availability_hours = availability_hours
         self.employed_since = employed_since
+        
+        # New dummy attributes
+        self.age = age
+        self.phone = phone
+        self.address = address
 
     def calculate_earnings(self, orders):
         total_earnings = 0

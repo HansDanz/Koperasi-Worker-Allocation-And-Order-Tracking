@@ -73,8 +73,12 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
     <div class="bg-white">
         <div class="flex justify-between items-start mb-2">
             <div>
-                <h3 class="text-lg font-bold text-gray-800">{order.product_name}</h3>
+                <h3 class="text-lg font-bold text-gray-800">#{order.id} - {order.product_name}</h3>
                 <p class="text-sm text-gray-500">{order.client_name}</p>
+                <div class="flex gap-1 mt-1">
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded border border-gray-200">{getattr(order, 'clothes_category', '-') or '-'}</span>
+                    <span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100">{getattr(order, 'clothes_type', '-') or '-'}</span>
+                </div>
             </div>
             <span class="px-2 py-1 text-xs font-semibold rounded-full bg-{color}-100 text-{color}-800">
                 {order.status or 'Unknown'}
@@ -117,7 +121,7 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
 
         # Render Content via Iframe (Tailwind)
         # Height reduced because buttons are gone and padding is tight
-        render_tailwind(card_content_html, height=160)
+        render_tailwind(card_content_html, height=220)
         
         # Native Buttons Footer
         c1, spacer, c2 = st.columns([3, 4, 3])
