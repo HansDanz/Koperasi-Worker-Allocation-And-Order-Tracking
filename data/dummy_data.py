@@ -204,9 +204,73 @@ def generate_dummy_data():
             
             projects_map[project_key] = new_order
 
-    # Create temporary list of orders
+    # Create temporary list of existing orders
     temp_orders = list(projects_map.values())
+
+    # --- 3. Generate Synthetic "Filler" Orders (for robust Financials) ---
+    # Generate ~50 orders spread across 2025
+    # Types: Uniform, Jersey, PDH (Bulk items)
+    filler_types = [
+        ("Uniform", "Uniform Shirt"), ("Uniform", "Uniform Skirt"), 
+        ("Custom", "Jersey"), ("Uniform", "PDH")
+    ]
     
+    start_date_range = datetime(2025, 1, 1)
+    end_date_range = datetime(2025, 12, 1)
+    
+    for _ in range(60): # 60 synthetic orders
+        o_id = 1000 + len(projects_map) + 1 + _
+        
+        # Pick random type
+        cat, typ = random.choice(filler_types)
+        
+        # Random Qty (Bulk is usually 20-100)
+        qty = random.randint(20, 150)
+        
+        # Random Date in 2025
+        days_offset = random.randint(0, 330)
+        p_start = start_date_range + timedelta(days=days_offset)
+        # Duration 10-25 days
+        p_duration = random.randint(10, 25)
+        p_deadline = p_start + timedelta(days=p_duration)
+        
+        # Financials
+        unit_p, mat_cost, wage_per = get_pricing(typ, cat)
+        total_budget = unit_p * qty
+        actual_cost_val = (mat_cost + wage_per) * qty # Simple actual cost assumption
+        
+        # Assign to random tailor (Mock assignment)
+        # Just pick one tailor for simplicity or split? stick to 1 for filler.
+        t_assigned = random.choice(tailors)
+        t_data = {
+            "assigned": qty,
+            "completed": qty,
+            "picked_up": True,
+            "days_needed": p_duration,
+            "hours_per_piece": 4
+        }
+        
+        new_order = Order(
+            id=o_id,
+            product_name=f"{typ} ({cat}) - Batch {_}", # Distinct name
+            client_name=f"Client {random.randint(100, 999)}",
+            quantity_required=qty,
+            quantity_completed=qty,
+            tailors_involved={t_assigned.id: t_data},
+            unit_price=unit_p,
+            deadline_date=p_deadline.strftime("%Y-%m-%d"),
+            current_status="COMPLETED",
+            start_date=p_start.strftime("%Y-%m-%d"),
+            clothes_category=cat,
+            clothes_type=typ,
+            budget=total_budget,
+            actual_cost=actual_cost_val
+        )
+        new_order.wage_per_piece = wage_per
+        new_order.material_cost_per_piece = mat_cost
+        
+        temp_orders.append(new_order)
+
     # Sort by Start Date Descending (Newest First)
     # Convert dates to datetime for correct sorting if they are strings
     temp_orders.sort(key=lambda x: pd.to_datetime(x.start_date), reverse=True)
