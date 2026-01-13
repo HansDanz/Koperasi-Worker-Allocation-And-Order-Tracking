@@ -4,6 +4,21 @@ from UI_components.qc_dialog import update_progress_dialog
 from models.order import Order
 
 
+
+@st.dialog("Update Actual Cost")
+def edit_cost_dialog(order):
+    st.write(f"Update cost for **{order.product_name}**")
+    st.info(f"Budget: IDR {getattr(order, 'budget', 0):,.0f}")
+    
+    current_cost = getattr(order, 'actual_cost', 0)
+    new_cost = st.number_input("Actual Project Cost (IDR)", min_value=0, step=1000, value=current_cost)
+    
+    if st.button("Save", type="primary"):
+        order.actual_cost = new_cost
+        st.success("Cost updated!")
+        st.rerun()
+
+
 def render_order_card(order, tailor_lookup, trigger_rerun=None):
     """
     Renders an order card using Tailwind CSS with visual progress bar for the workflow.
@@ -107,25 +122,32 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
         # Native Buttons Footer
         c1, spacer, c2 = st.columns([3, 4, 3])
         with c1:
-             if hasattr(order, 'advance_status') and order.status != "COMPLETED":
-                  target_stage_idx = Order.STATUS_FLOW.index(order.status) + 1
-                  if target_stage_idx < len(Order.STATUS_FLOW):
-                      target_stage = Order.STATUS_FLOW[target_stage_idx]
-                      
-                      # SOP Check: Only allow moving to DISTRIBUTION if quantity is fully completed
-                      if target_stage == "DISTRIBUTION" and order.quantity_completed < order.quantity_required:
-                          # Option: Show disabled button or nothing? User said "remove".
-                          # Let's show a disabled button or just nothing.
-                          # Nothing is cleaner given layout. But explicit "Finish Sewing First" might be better UI.
-                          # Let's show nothing to comply with "remove".
-                          pass
-                      else:
-                          # Primary button for Next
-                          if st.button(f"Next: {target_stage}", key=f"adv_{order.id}", type="primary", use_container_width=True):
-                              if order.advance_status():
-                                  st.rerun()
+             if hasattr(order, 'advance_status'):
+                  if order.status == "COMPLETED":
+                       # Show cost if set, else show button
+                       cost = getattr(order, 'actual_cost', 0)
+                       if cost > 0:
+                           st.caption(f"Actual Cost: **IDR {cost:,.0f}**")
+                       else:
+                           if st.button("Input Actual Cost", key=f"cost_{order.id}", type="primary", use_container_width=True):
+                               edit_cost_dialog(order)
+                  else:
+                      target_stage_idx = Order.STATUS_FLOW.index(order.status) + 1
+                      if target_stage_idx < len(Order.STATUS_FLOW):
+                          target_stage = Order.STATUS_FLOW[target_stage_idx]
+                          
+                          # SOP Check: Only allow moving to DISTRIBUTION if quantity is fully completed
+                          if target_stage == "DISTRIBUTION" and order.quantity_completed < order.quantity_required:
+                               pass
+                          else:
+                              # Formatting
+                              formatted_stage = target_stage.replace("_", " ").title()
+                              # Primary button for Next
+                              if st.button(f"Next: {formatted_stage}", key=f"adv_{order.id}", type="primary", use_container_width=True):
+                                  if order.advance_status():
+                                      st.rerun()
 
         with c2:
-             if st.button("Details / QC", key=f"manage_{order.id}", use_container_width=True):
+             if st.button("Details", key=f"manage_{order.id}", use_container_width=True):
                  st.session_state.detail_order_id = order.id
                  st.rerun()

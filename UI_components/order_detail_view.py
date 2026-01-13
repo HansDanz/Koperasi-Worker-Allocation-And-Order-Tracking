@@ -4,6 +4,21 @@ from UI_components.qc_dialog import update_progress_dialog
 from models.order import Order
 from UI_components.ml_assignment import assign_ml_dialog
 
+@st.dialog("Finalize Order Completion")
+def complete_order_dialog(order):
+    st.write(f"Marking **{order.product_name}** as Completed.")
+    
+    # Financials
+    st.info(f"Budget: IDR {getattr(order, 'budget', 0):,.0f}")
+    
+    actual_cost = st.number_input("Actual Project Cost (IDR)", min_value=0, step=1000)
+    
+    if st.button("Confirm & Complete", type="primary"):
+        order.actual_cost = actual_cost
+        if order.advance_status():
+            st.success("Order Completed!")
+            st.rerun()
+
 def render_order_detail(order, tailor_lookup):
     """
     Renders the full details of an order, including tailor management, QC, and pickup confirmation.
@@ -49,6 +64,10 @@ def render_order_detail(order, tailor_lookup):
     with col_stat:
         st.metric("Status", order.status)
         st.metric("Deadline", str(order.deadline_date))
+        st.caption(f"Budget: IDR {getattr(order, 'budget', 0):,.0f}")
+        actual_cost = getattr(order, 'actual_cost', 0)
+        if actual_cost > 0:
+             st.caption(f"Actual Cost: **IDR {actual_cost:,.0f}**")
         
     with col_prog:
         if hasattr(order, 'progress_pct'):
@@ -59,6 +78,7 @@ def render_order_detail(order, tailor_lookup):
         st.write(f"**Workflow Progress**: {progress}%")
         st.progress(progress / 100)
         st.write(f"**Quantity**: {order.quantity_completed} / {order.quantity_required} pcs")
+        st.caption(f"Worker Wage: IDR {getattr(order, 'unit_price', 0):,.0f} / pc")
 
     st.divider()
 
@@ -120,8 +140,9 @@ def render_order_detail(order, tailor_lookup):
         st.divider()
         qc_col1, qc_col2 = st.columns([1, 4])
         with qc_col1:
-             if st.button("Update QC / Progress", key="detail_qc_btn", type="primary"):
-                 update_progress_dialog(order, tailor_lookup)
+             if order.status != "COMPLETED":
+                 if st.button("Update Progress", key="detail_qc_btn", type="primary"):
+                     update_progress_dialog(order, tailor_lookup)
                  
     else:
         st.write("No tailors involved.")
@@ -138,6 +159,11 @@ def render_order_detail(order, tailor_lookup):
             # SOP Check: Only allow moving to DISTRIBUTION if quantity is fully completed
             if target_stage == "DISTRIBUTION" and order.quantity_completed < order.quantity_required:
                  st.warning(f"⚠️ Cannot move to {target_stage} yet. Finish sewing all items first.")
+                 
+            elif target_stage == "COMPLETED":
+                if st.button("Complete Order 🏁", key=f"detail_comp_{order.id}", type="primary"):
+                    complete_order_dialog(order)
+                    
             else:
                 if st.button(f"Next Stage: {target_stage} ➡️", key=f"detail_next_{order.id}", type="primary"):
                     if order.advance_status():

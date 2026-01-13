@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import date
 from utils.auth_utils import check_auth
 
 check_auth()
@@ -29,11 +30,13 @@ def new_order():
     quantity_required = st.number_input("Quantity Required", min_value=1, step=1)
     deadline = st.date_input("Deadline")
     
+    # Financials
+    budget = st.number_input("Budget Cost (IDR)", min_value=0, step=1000)
+    wage = st.number_input("Wage per Piece (IDR)", min_value=0, step=100)
+    
     if st.button("Submit"):
         # Create order properly
-        # Note: add_order util usually takes partial args, might need updating or direct append
-        # For compatibility, we'll use the helper if it matches, else manual append
-        add_order(product_name, client_name, quantity_required) 
+        add_order(product_name, client_name, quantity_required, budget=budget, wage_per_piece=wage, deadline=deadline) 
         # Since add_order might not set deadline, we might want to update the last added order
         # But for now let's rely on defaults or update helper later
         st.success("Order added")
@@ -57,8 +60,8 @@ with col_filter:
 
 # Logic for categorizing statuses
 status_map = {
-    "Pre-Production": ["DRAFT", "PROOFING", "MATERIAL_SOURCING"],
-    "In Production": ["CUTTING", "SEWING"],
+    "Pre-Production": ["DRAFT", "PROOFING", "MATERIAL_SOURCING", "CUTTING"],
+    "In Production": ["SEWING"],
     "Finished": ["DISTRIBUTION", "COMPLETED"] # Distribution is now delivery to customer
 }
 
@@ -75,7 +78,7 @@ else:
 
 # 2. Sort by Deadline (Urgency), then by Assignment Status (Unassigned first)
 filtered_orders.sort(key=lambda x: (
-    x.deadline_date if x.deadline_date else "9999-12-31", 
+    x.deadline_date if x.deadline_date else date(9999, 12, 31), 
     bool(x.tailors_involved) # False (0) < True (1), so Unassigned shows first
 ))
 
@@ -102,13 +105,10 @@ else:
 # Only open dialogs if they were triggered from this page
 if st.session_state.get("assignment_origin") == "Orders":
     if st.session_state.assignment_mode == "ML":
-        st.session_state.assignment_mode = None
         assign_ml_dialog(st.session_state.current_order)
 
     elif st.session_state.assignment_mode == "MANUAL":
-        st.session_state.assignment_mode = None
         assign_manual_dialog(st.session_state.current_order)
 
     elif st.session_state.assignment_mode == "QTY":
-        st.session_state.assignment_mode = None
         assign_quantity_dialog(st.session_state.current_order)

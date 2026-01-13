@@ -78,7 +78,7 @@ def assign_quantity_dialog(order):
             st.rerun()
 
     with col2:
-        if st.button("Reject & Reassign"):
+        if st.button("Reject & Reassign", use_container_width=True):
             st.session_state.quantity_allocation.clear()
             st.session_state.assignment_mode = "MANUAL"
             st.rerun()

@@ -25,7 +25,9 @@ class Order:
         deadline_date = None,
         complexity_score = 5,
         current_status = "DRAFT",
-        start_date = None
+        start_date = None,
+        budget = 0,
+        actual_cost = 0
     ):
         self.id = id
         self.product_name = product_name
@@ -33,9 +35,13 @@ class Order:
         self.quantity_required = quantity_required
         self.quantity_completed = quantity_completed
         self.tailors_involved = tailors_involved
-        self.unit_price = unit_price
+        self.unit_price = unit_price # Worker Wage per piece
         self.deadline_date = deadline_date
         self.complexity_score = complexity_score
+        
+        # Financials
+        self.budget = budget
+        self.actual_cost = actual_cost
         
         # New Workflow Fields
         if current_status not in self.STATUS_FLOW:

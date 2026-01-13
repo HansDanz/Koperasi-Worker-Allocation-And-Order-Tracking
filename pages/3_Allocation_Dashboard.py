@@ -51,15 +51,12 @@ else:
 # Only open dialogs if they were triggered from this page
 if st.session_state.get("assignment_origin") == "Allocation":
     if st.session_state.assignment_mode == "ML":
-        st.session_state.assignment_mode = None
         assign_ml_dialog(st.session_state.current_order)
 
     elif st.session_state.assignment_mode == "MANUAL":
-        st.session_state.assignment_mode = None
         assign_manual_dialog(st.session_state.current_order)
 
     elif st.session_state.assignment_mode == "QTY":
-        st.session_state.assignment_mode = None
         assign_quantity_dialog(st.session_state.current_order)
 
 

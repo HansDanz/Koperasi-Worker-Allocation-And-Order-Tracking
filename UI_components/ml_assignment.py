@@ -80,7 +80,7 @@ def assign_ml_dialog(order):
             st.rerun()
 
     with col2:
-        if st.button("Reject & Choose Manually"):
+        if st.button("Reject & Choose Manually", use_container_width=True):
             st.session_state.selected_tailors.clear()
             st.session_state.assignment_mode = "MANUAL"
             st.rerun()

@@ -25,7 +25,7 @@ def assign_manual_dialog(order):
         """, unsafe_allow_html=True)
     
     with col2:
-        if st.button("Submit", type="primary"):
+        if st.button("Submit", type="primary", use_container_width=True):
             st.session_state.assignment_mode = "QTY"
             st.rerun()
 
