@@ -3,7 +3,11 @@ from UI_components.order_card import render_order_card
 from utils.helpers import add_order
 from UI_components.ml_assignment import assign_ml_dialog
 from UI_components.manual_assignment import assign_manual_dialog
+
 from UI_components.quantity_assignment import assign_quantity_dialog
+from utils.auth_utils import check_auth
+
+check_auth()
 
 st.title("Orders")
 

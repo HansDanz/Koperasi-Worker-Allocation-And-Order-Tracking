@@ -1,13 +1,14 @@
 from models.tailor import Tailor
 from models.order import Order
 
+
 def get_dummy_tailors():
     return [
         Tailor(
             id=1,
             name="Ibu Sari",
-            skill_vector={"SEWING": 0.9, "QC": 0.7},
-            reliability_score=0.85,
+            skill_vector={"SEWING": 9, "QC": 7},
+            reliability_score=8.5,
             current_workload=20,
             max_capacity=40,
             availability_hours=25,
@@ -16,8 +17,8 @@ def get_dummy_tailors():
         Tailor(
             id=2,
             name="Ibu Lina",
-            skill_vector={"CUTTING": 0.8, "SEWING": 0.6},
-            reliability_score=0.78,
+            skill_vector={"CUTTING": 8, "SEWING": 6},
+            reliability_score=7.8,
             current_workload=15,
             max_capacity=30,
             availability_hours=20,
@@ -26,8 +27,8 @@ def get_dummy_tailors():
         Tailor(
             id=3,
             name="Ibu Rini",
-            skill_vector={"SEWING": 0.95},
-            reliability_score=0.92,
+            skill_vector={"SEWING": 9.5},
+            reliability_score=9.2,
             current_workload=30,
             max_capacity=50,
             availability_hours=30,
@@ -45,11 +46,15 @@ def get_dummy_orders():
             client_name="SDN Surabaya 3",
             quantity_required=100,
             quantity_completed=45,
+
             tailors_involved={
                 1: 20,  # Ibu Sari
                 2: 15,  # Ibu Lina
                 3: 10,  # Ibu Rini
             },
+            unit_price=15000,
+            deadline_date="2024-02-15",
+            complexity_score=7
         ),
         Order(
             id=102,
@@ -60,6 +65,9 @@ def get_dummy_orders():
             tailors_involved={
                 3: 50,
             },
+            unit_price=25000,
+            deadline_date="2024-01-20",
+            complexity_score=8
         ),
         Order(
             id=103,
@@ -70,5 +78,8 @@ def get_dummy_orders():
             tailors_involved={
                 1: 10,
             },
+            unit_price=12000,
+            deadline_date="2024-03-01",
+            complexity_score=5
         ),
     ]

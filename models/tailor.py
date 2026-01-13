@@ -8,3 +8,13 @@ class Tailor:
         self.current_workload = current_workload
         self.availability_hours = availability_hours
         self.employed_since = employed_since
+
+    def calculate_earnings(self, orders):
+        total_earnings = 0
+        for order in orders:
+            # Check if order has 'unit_price' attribute to avoid errors with old data
+            price = getattr(order, 'unit_price', 0)
+            if order.tailors_involved and self.id in order.tailors_involved:
+                qty_done_by_tailor = order.tailors_involved[self.id]
+                total_earnings += qty_done_by_tailor * price
+        return total_earnings
