@@ -1,3 +1,4 @@
+import datetime
 from models.tailor import Tailor
 from models.order import Order
 
@@ -35,8 +36,6 @@ def get_dummy_tailors():
         ),
     ]
 
-from models.order import Order
-
 def get_dummy_orders():
     return [
         Order(
@@ -44,6 +43,8 @@ def get_dummy_orders():
             product_name="School Uniform",
             client_name="SDN Surabaya 3",
             quantity_required=100,
+            placement_date=datetime.date(2024,1,11),
+            due_date=datetime.date(2025, 1, 11),
             quantity_completed=45,
             tailors_involved={
                 1: 20,  # Ibu Sari
@@ -51,11 +52,14 @@ def get_dummy_orders():
                 3: 10,  # Ibu Rini
             },
         ),
+
         Order(
             id=102,
             product_name="Batik Shirt",
             client_name="Local Retailer A",
             quantity_required=50,
+            placement_date=datetime.date(2024, 1, 11),
+            due_date=datetime.date(2025, 1, 11),
             quantity_completed=50,
             tailors_involved={
                 3: 50,
@@ -66,6 +70,8 @@ def get_dummy_orders():
             product_name="Prayer Garment",
             client_name="Community Group",
             quantity_required=80,
+            placement_date=datetime.date(2024, 1, 11),
+            due_date=datetime.date(2025, 1, 11),
             quantity_completed=10,
             tailors_involved={
                 1: 10,
