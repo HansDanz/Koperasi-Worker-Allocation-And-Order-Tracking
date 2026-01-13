@@ -9,27 +9,11 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
     Renders an order card using Tailwind CSS with visual progress bar for the workflow.
     """
     # Inject Custom CSS for Blue Buttons (Tailwind #3b82f6) locally for this component area
-    st.markdown("""
-        <style>
-        /* Target buttons inside the columns we create below, 
-           or generally stButton in this context if isolation is hard. */
-        div.stButton > button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.875rem; 
-        }
-        div.stButton > button:hover {
-            background-color: #2563eb;
-            color: white;
-        }
-        div.stButton > button:focus {
-            color: white;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    # Inject Custom CSS for Blue Buttons (Tailwind #3b82f6) locally for this component area
+    # Removed broad CSS that was affecting global buttons (like Logout). 
+    # Global styling is now handled in auth_utils.py.
+    # We rely on type="primary" for the specific blue buttons.
+
     
     # Calculate progress for visual bar
     if hasattr(order, 'progress_pct'):
@@ -127,10 +111,19 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
                   target_stage_idx = Order.STATUS_FLOW.index(order.status) + 1
                   if target_stage_idx < len(Order.STATUS_FLOW):
                       target_stage = Order.STATUS_FLOW[target_stage_idx]
-                      # Primary button for Next
-                      if st.button(f"Next: {target_stage}", key=f"adv_{order.id}", type="primary", use_container_width=True):
-                          if order.advance_status():
-                              st.rerun()
+                      
+                      # SOP Check: Only allow moving to DISTRIBUTION if quantity is fully completed
+                      if target_stage == "DISTRIBUTION" and order.quantity_completed < order.quantity_required:
+                          # Option: Show disabled button or nothing? User said "remove".
+                          # Let's show a disabled button or just nothing.
+                          # Nothing is cleaner given layout. But explicit "Finish Sewing First" might be better UI.
+                          # Let's show nothing to comply with "remove".
+                          pass
+                      else:
+                          # Primary button for Next
+                          if st.button(f"Next: {target_stage}", key=f"adv_{order.id}", type="primary", use_container_width=True):
+                              if order.advance_status():
+                                  st.rerun()
 
         with c2:
              if st.button("Details / QC", key=f"manage_{order.id}", use_container_width=True):

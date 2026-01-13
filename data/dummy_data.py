@@ -140,4 +140,16 @@ def get_dummy_orders():
             complexity_score=3,
             current_status="MATERIAL_SOURCING"
         ),
+        Order(
+            id=107,
+            product_name="Test Allocation Order",
+            client_name="Demo Client",
+            quantity_required=20,
+            quantity_completed=0,
+            tailors_involved=None,
+            unit_price=50000,
+            deadline_date="2024-06-01",
+            complexity_score=5,
+            current_status="SEWING"
+        ),
     ]

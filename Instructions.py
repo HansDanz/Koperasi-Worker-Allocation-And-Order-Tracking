@@ -1,13 +1,11 @@
 import streamlit as st
-
-
-
-from data.dummy_data import get_dummy_orders, get_dummy_tailors
-from utils.style_utils import render_tailwind
 from utils.auth_utils import check_auth, logout_button
 
 st.set_page_config(layout="wide")
-check_auth()  # Basic auth check
+check_auth()  # Basic auth check - Redirects fast if not logged in
+
+from data.dummy_data import get_dummy_orders, get_dummy_tailors
+from utils.style_utils import render_tailwind
 
 # Demo of Tailwind Integration
 render_tailwind("""
@@ -37,4 +35,3 @@ if "manual_selected_tailors" not in st.session_state:
 if "quantity_allocation" not in st.session_state:
     st.session_state.quantity_allocation = {}
 
-logout_button()

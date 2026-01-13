@@ -1,10 +1,10 @@
 import streamlit as st
-from UI_components.tailor_card import render_tailor_card
-
-from utils.helpers import add_tailor
 from utils.auth_utils import check_auth
 
 check_auth()
+
+from UI_components.tailor_card import render_tailor_card
+from utils.helpers import add_tailor
 
 st.title("Workers")
 

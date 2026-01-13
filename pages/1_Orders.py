@@ -1,13 +1,15 @@
 import streamlit as st
+from utils.auth_utils import check_auth
+
+check_auth()
+
 from UI_components.order_card import render_order_card
 from utils.helpers import add_order
 from UI_components.ml_assignment import assign_ml_dialog
 from UI_components.manual_assignment import assign_manual_dialog
 from UI_components.quantity_assignment import assign_quantity_dialog
-from utils.auth_utils import check_auth
 from models.order import Order
-
-check_auth()
+from UI_components.order_detail_view import render_order_detail
 
 st.title("Orders Management")
 
@@ -71,8 +73,11 @@ else:
     allowed_statuses = status_map.get(filter_option, [])
     filtered_orders = [o for o in orders if o.status in allowed_statuses]
 
-# 2. Sort by Deadline (Urgency)
-filtered_orders.sort(key=lambda x: x.deadline_date if x.deadline_date else "9999-12-31")
+# 2. Sort by Deadline (Urgency), then by Assignment Status (Unassigned first)
+filtered_orders.sort(key=lambda x: (
+    x.deadline_date if x.deadline_date else "9999-12-31", 
+    bool(x.tailors_involved) # False (0) < True (1), so Unassigned shows first
+))
 
 # Display Logic: Detail View vs List View
 if "detail_order_id" in st.session_state and st.session_state.detail_order_id is not None:
@@ -94,12 +99,16 @@ else:
             render_order_card(order, tailor_lookup)
 
 # Assignment Dialogs Logic
-if st.session_state.assignment_mode == "ML":
-    st.session_state.assignment_mode = None
-    assign_ml_dialog(st.session_state.current_order)
+# Only open dialogs if they were triggered from this page
+if st.session_state.get("assignment_origin") == "Orders":
+    if st.session_state.assignment_mode == "ML":
+        st.session_state.assignment_mode = None
+        assign_ml_dialog(st.session_state.current_order)
 
-elif st.session_state.assignment_mode == "MANUAL":
-    assign_manual_dialog(st.session_state.current_order)
+    elif st.session_state.assignment_mode == "MANUAL":
+        st.session_state.assignment_mode = None
+        assign_manual_dialog(st.session_state.current_order)
 
-elif st.session_state.assignment_mode == "QTY":
-    assign_quantity_dialog(st.session_state.current_order)
+    elif st.session_state.assignment_mode == "QTY":
+        st.session_state.assignment_mode = None
+        assign_quantity_dialog(st.session_state.current_order)

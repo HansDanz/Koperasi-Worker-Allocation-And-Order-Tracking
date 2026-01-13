@@ -6,8 +6,37 @@ def assign_ml_dialog(order):
     st.subheader("Recommended Tailors")
 
     tailors = st.session_state.tailors
+    orders = st.session_state.orders
 
-    available_tailors = [t for t in tailors if t.current_workload < t.max_capacity]
+    # Inject Blue CSS for Dialog
+    st.markdown("""
+        <style>
+        div.stButton > button[kind="primary"] {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+        div.stButton > button[kind="primary"]:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    
+    # 1. Identify Busy Tailors (One Order Per Tailor SOP)
+    busy_tailor_ids = set()
+    for o in orders:
+        if o.status != "COMPLETED" and o.tailors_involved:
+            for tid in o.tailors_involved:
+                busy_tailor_ids.add(tid)
+                
+    # 2. Filter: Capacity < Max AND Not Busy
+    available_tailors = [
+        t for t in tailors 
+        if t.current_workload < t.max_capacity and t.id not in busy_tailor_ids
+    ]
+
 
     for tailor in available_tailors:
         with st.expander(f"{tailor.name}", expanded=False):
@@ -46,7 +75,7 @@ def assign_ml_dialog(order):
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("Accept"):
+        if st.button("Accept", type="primary"):
             st.session_state.assignment_mode = "QTY"
             st.rerun()
 

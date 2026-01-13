@@ -1,11 +1,11 @@
 import streamlit as st
-import pandas as pd
-
-from utils.style_utils import render_tailwind
 from utils.auth_utils import check_auth
 
 # Ensure login
 check_auth()
+
+import pandas as pd
+from utils.style_utils import render_tailwind
 
 st.title("Payroll & Income Dashboard")
 

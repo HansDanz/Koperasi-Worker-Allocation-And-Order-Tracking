@@ -11,6 +11,21 @@ def assign_quantity_dialog(order):
 
     st.subheader(f"Order: {order.product_name}")
     st.caption(f"Total required: {order.quantity_required}")
+    
+    # Inject Blue CSS for Dialog
+    st.markdown("""
+        <style>
+        div.stButton > button[kind="primary"] {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+        div.stButton > button[kind="primary"]:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
     total_assigned = 0
 
@@ -51,7 +66,7 @@ def assign_quantity_dialog(order):
     with col1:
         if (
             total_assigned == order.quantity_required
-            and st.button("Accept Allocation")
+            and st.button("Accept Allocation", type="primary")
         ):
             order.tailors_involved = dict(st.session_state.quantity_allocation)
 

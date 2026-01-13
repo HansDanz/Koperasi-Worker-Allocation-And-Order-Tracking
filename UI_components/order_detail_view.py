@@ -71,6 +71,7 @@ def render_order_detail(order, tailor_lookup):
         if st.button("Assign Tailors", key=f"detail_assign_{order.id}", type="primary"):
             st.session_state.current_order = order
             st.session_state.assignment_mode = "ML" 
+            st.session_state.assignment_origin = "Orders"
             st.rerun()
             
     # 2. Tailor List & Actions
@@ -133,11 +134,15 @@ def render_order_detail(order, tailor_lookup):
         target_stage_idx = Order.STATUS_FLOW.index(order.status) + 1
         if target_stage_idx < len(Order.STATUS_FLOW):
             target_stage = Order.STATUS_FLOW[target_stage_idx]
-            if st.button(f"Next Stage: {target_stage} ➡️", key=f"detail_next_{order.id}", type="primary"):
-                if order.advance_status():
-                    st.session_state.detail_order_id = None # Return to list after advancing? Or stay? 
-                    # Usually better to return to list as status changed implies new phase
-                    st.rerun()
+            
+            # SOP Check: Only allow moving to DISTRIBUTION if quantity is fully completed
+            if target_stage == "DISTRIBUTION" and order.quantity_completed < order.quantity_required:
+                 st.warning(f"⚠️ Cannot move to {target_stage} yet. Finish sewing all items first.")
+            else:
+                if st.button(f"Next Stage: {target_stage} ➡️", key=f"detail_next_{order.id}", type="primary"):
+                    if order.advance_status():
+                        st.session_state.detail_order_id = None 
+                        st.rerun()
 
     # Back Button (Styled Red via CSS injection below)
     # Inject CSS specific for the Back button (which is rendered last)
