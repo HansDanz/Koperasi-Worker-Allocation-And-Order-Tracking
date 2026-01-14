@@ -146,9 +146,15 @@ def generate_dummy_data():
             existing_order.quantity_completed += qty 
             
             # Update financials (Budget increases with qty)
-            # We need to re-calc budget based on new qty
-            # We stored unit_price in existing_order, so use it.
             existing_order.budget = existing_order.quantity_required * existing_order.unit_price
+            
+            # Update Actual Cost (Approx)
+            _, mat_cost_batch, wage_per_batch = get_pricing(typ, cat)
+            batch_cost_val = (mat_cost_batch + wage_per_batch) * qty * random.uniform(0.95, 1.05)
+            if hasattr(existing_order, 'actual_cost'):
+                existing_order.actual_cost += batch_cost_val
+            else:
+                 existing_order.actual_cost = batch_cost_val
             
             # Add or Update tailor
             if t_id in existing_order.tailors_involved:
@@ -164,24 +170,13 @@ def generate_dummy_data():
             o_id = 1000 + len(projects_map) # Simple incremental ID
             
             # Generate Financials
+            # Generate Financials
             unit_p, mat_cost, wage_per = get_pricing(typ, cat)
             total_budget = unit_p * qty
             
-            # Helper: We will store material cost in actual_cost for now as a proxy, 
-            # or we need to add a field. `actual_cost` in model usually means TOTAL cost.
-            # Let's assume actual_cost = Total Material + Total Wages (once assigned).
-            # But for initial dummy data, let's just use budget.
-            # We will use `unit_price` field to store the REVENUE per piece (Price Client Pays)
-            # And we need to store WAGE somewhere. Model has `wage_per_piece` in constructor/init but not mapped?
-            # Checked model: `unit_price` comment says "# Worker Wage per piece" in line 40? 
-            # Wait, Line 40: self.unit_price = unit_price # Worker Wage per piece
-            # That comment seems confusing or wrong if unit_price is usually Client Price.
-            # Let's fix the Model usage. 
-            # Common sense: unit_price = Client Price. 
-            # We need a new field `wage_per_piece` in Order if we want to track it, or just use `complexity_score` map.
-            # Let's add `wage_per_piece` to Order dynamically or repurpose.
-            # Actually, the user asked for "Price per piece of cloth to wage the worker".
-            # Let's assume we can add `wage_per_piece` to the Order object.
+            # Calculate Valid Actual Cost (Material + Wage + small variation)
+            base_cost = (mat_cost + wage_per) * qty
+            actual_cost_val = base_cost * random.uniform(0.95, 1.05)
             
             new_order = Order(
                 id=o_id,
@@ -196,7 +191,8 @@ def generate_dummy_data():
                 start_date=start_date,
                 clothes_category=cat,
                 clothes_type=typ,
-                budget=total_budget
+                budget=total_budget,
+                actual_cost=actual_cost_val
             )
             # Inject extra fields dynamically since Model might strictly define init but we can add props in Python
             new_order.wage_per_piece = wage_per
@@ -258,7 +254,7 @@ def generate_dummy_data():
             quantity_completed=qty,
             tailors_involved={t_assigned.id: t_data},
             unit_price=unit_p,
-            deadline_date=p_deadline.strftime("%Y-%m-%d"),
+            deadline_date=p_deadline.date(), # Store as date object, not string
             current_status="COMPLETED",
             start_date=p_start.strftime("%Y-%m-%d"),
             clothes_category=cat,
@@ -271,9 +267,9 @@ def generate_dummy_data():
         
         temp_orders.append(new_order)
 
-    # Sort by Start Date Descending (Newest First)
+    # Sort by Start Date Ascending (Oldest First) for chronological IDs
     # Convert dates to datetime for correct sorting if they are strings
-    temp_orders.sort(key=lambda x: pd.to_datetime(x.start_date), reverse=True)
+    temp_orders.sort(key=lambda x: pd.to_datetime(x.start_date), reverse=False)
     
     # Re-assign IDs sequentially (Newest = Smallest ID)
     final_orders = []

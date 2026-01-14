@@ -85,7 +85,7 @@ def render_tailor_card(tailor, orders=[]):
     
     with st.container(border=True):
         # Render content
-        render_tailwind(card_html, height=340)
+        render_tailwind(card_html, height=400, scrolling=True)
         
         # Action Button (Inside the container)
         if st.button("View Profile", key=f"btn_prof_{tailor.id}", use_container_width=True, type="primary"):

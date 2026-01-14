@@ -1,5 +1,6 @@
 import streamlit as st
-from datetime import date
+import pandas as pd
+from datetime import date, datetime
 from utils.auth_utils import check_auth
 
 check_auth()
@@ -74,16 +75,19 @@ with col_filter:
         index=0
     )
 
+with col_sort:
+    sort_option = st.selectbox(
+        "Sort Order",
+        ["Oldest First", "Newest First"],
+        index=0
+    )
+
 # Logic for categorizing statuses
 status_map = {
     "Pre-Production": ["DRAFT", "PROOFING", "MATERIAL_SOURCING", "CUTTING"],
     "In Production": ["SEWING"],
     "Finished": ["DISTRIBUTION", "COMPLETED"] # Distribution is now delivery to customer
 }
-
-from UI_components.order_detail_view import render_order_detail
-
-# ... (imports)
 
 # 1. Filter
 if filter_option == "All":
@@ -92,11 +96,10 @@ else:
     allowed_statuses = status_map.get(filter_option, [])
     filtered_orders = [o for o in orders if o.status in allowed_statuses]
 
-# 2. Sort by Deadline (Urgency), then by Assignment Status (Unassigned first)
-filtered_orders.sort(key=lambda x: (
-    x.deadline_date if x.deadline_date else date(9999, 12, 31), 
-    bool(x.tailors_involved) # False (0) < True (1), so Unassigned shows first
-))
+# 2. Sort
+# ID Ascending = Oldest First (because IDs are assigned chronologically 1001, 1002...)
+reverse_sort = True if sort_option == "Newest First" else False
+filtered_orders.sort(key=lambda x: x.id, reverse=reverse_sort)
 
 # Display Logic: Detail View vs List View
 if "detail_order_id" in st.session_state and st.session_state.detail_order_id is not None:
@@ -129,8 +132,7 @@ else:
             if search_query in o.product_name.lower() or str(o.id) in search_query
         ]
 
-    # Sort by ID Ascending (Smallest ID = Newest Date logic applied in data gen)
-    filtered_orders.sort(key=lambda x: x.id)
+
 
     if not filtered_orders:
         st.info(f"No orders found matching your criteria.")

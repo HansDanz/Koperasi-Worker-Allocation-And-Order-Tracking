@@ -8,6 +8,6 @@ try:
     st.write("Columns:")
     st.write(df.columns.tolist())
     st.write("First 5 rows:")
-    st.dataframe(df.head(5))
+    st.dataframe(df)
 except Exception as e:
     st.error(f"Error: {e}")

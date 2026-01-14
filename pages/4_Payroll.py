@@ -208,7 +208,8 @@ with tab_insights:
                  c_a, c_b = st.columns([1.5, 1])
                  with c_a:
                      fig3, ax3 = plt.subplots(figsize=(5,3))
-                     bars3 = ax3.bar(cat_stats.keys(), cat_stats.values(), color="#818cf8")
+                     colors = ["#818cf8", "#34d399", "#fbbf24", "#f87171", "#a78bfa"]
+                     bars3 = ax3.bar(cat_stats.keys(), cat_stats.values(), color=colors[:len(cat_stats)])
                      ax3.set_title("Net Profit (IDR)")
                      
                      ax3.yaxis.set_major_formatter(formatter)

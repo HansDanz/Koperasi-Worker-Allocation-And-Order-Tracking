@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-def render_tailwind(html_content, height=200):
+def render_tailwind(html_content, height=200, scrolling=False):
     """
     Renders HTML content with Tailwind CSS enabled using a Streamlit component (iframe).
     """
@@ -16,4 +16,4 @@ def render_tailwind(html_content, height=200):
     </body>
     </html>
     """
-    components.html(full_html, height=height, scrolling=False)
+    components.html(full_html, height=height, scrolling=scrolling)
