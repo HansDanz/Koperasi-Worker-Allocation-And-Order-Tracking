@@ -17,7 +17,7 @@ def add_order(product_name, client_name, quantity_required, budget=0, wage_per_p
 
     st.session_state.orders.append(new_order)
 
-def add_tailor(name, skill_vector, reliability_score, max_capacity, current_workload, availability_hours, employed_since):
+def add_tailor(name, skill_vector, reliability_score, availability_hours, employed_since):
     new_id = max(order.id for order in st.session_state.orders) + 1
 
     new_tailor = Tailor(
@@ -25,8 +25,6 @@ def add_tailor(name, skill_vector, reliability_score, max_capacity, current_work
         name=name,
         skill_vector=skill_vector,
         reliability_score=reliability_score,
-        max_capacity = max_capacity,
-        current_workload = current_workload,
         availability_hours=availability_hours,
         employed_since=employed_since,
     )

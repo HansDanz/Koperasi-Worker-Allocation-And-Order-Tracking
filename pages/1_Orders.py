@@ -45,6 +45,12 @@ def new_order():
 col1, col2 = st.columns([3, 1])
 with col2:
     if st.button(label = "+ New Order", type = "primary", use_container_width=True):
+        # Clear stale state to prevent previous recommendations from showing
+        st.session_state.pop("current_order", None)
+        st.session_state.assignment_mode = None
+        if "selected_tailors" in st.session_state:
+            st.session_state.selected_tailors = set()
+            
         new_order()
 
 

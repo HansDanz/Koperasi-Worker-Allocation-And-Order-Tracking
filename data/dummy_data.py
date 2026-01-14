@@ -21,11 +21,129 @@ def generate_tailors(count=50):
         last = random.choice(family_names)
         fullname = f"{first} {last}" if i % 2 == 0 else f"{first}"
         
+<<<<<<< Updated upstream
         # Skills
         raw_skills = ["SEWING", "CUTTING", "QC", "PACKING"]
         skills = {}
         for s in random.sample(raw_skills, k=random.randint(1, 3)):
             skills[s] = random.randint(5, 10)
+=======
+        # Get specialty from the first row of this tailor (assuming consistent)
+        raw_specialist = group["Specialist"].iloc[0]
+        # Map "All" -> Generalist or keep as is. User request: "specialists in Uniforms or generalists who can do All"
+        # We will normalize to capitalized strings for display
+        if str(raw_specialist).lower() == "all":
+            specialty = "Generalist" # Or "All" if preferred, but "Generalist" is clearer for "can do All"
+        else:
+            specialty = raw_specialist
+
+        # Calculate derived stats from history
+        total_items = group["Clothes Assigned"].sum()
+        # "Working Time per Clothes (in hours)"
+        avg_speed = group["Working Time per Clothes (in hours)"].mean()
+        
+        # Reliability/Skill simulation based on history
+        reliability = 9.0 + (random.random() * 1.0) # High score for existing workers
+        
+        # Dummy Personal Info
+        age = random.randint(22, 55)
+        phone = f"08{random.randint(100000000, 999999999)}"
+        cities = ["Surabaya"]
+        streets = ["Jl. Tunjungan", "Jl. Darmo", "Jl. Pemuda", "Jl. Basuki Rahmat", "Jl. Mayjen Sungkono", "Jl. HR Muhammad", "Jl. Kertajaya", "Jl. Raya Gubeng"]
+        address = f"{random.choice(streets)} No. {random.randint(1, 100)}, {random.choice(cities)}"
+        
+        new_tailor = Tailor(
+            id=t_id_str,
+            name=name,
+            skill_vector={"specialty": specialty}, 
+            reliability_score=round(reliability, 1),
+            availability_hours=random.randint(35, 48), # Weekly hours
+            employed_since=2020, # Placeholder
+            age=age,
+            phone=phone,
+            address=address
+        )
+        
+        tailors.append(new_tailor)
+        tailor_id_map[name] = t_id_str
+
+    # --- 2. Extract Historical Orders ---
+    # We essentially want to MERGE rows that belong to the "same project".
+    # Key: (Clothes Category, Clothes Type, Project Start, Project Deadline)
+    
+    # --- Pricing Logic ---
+    def get_pricing(clothes_type, clothes_category):
+        # Base pricing model (IDR)
+        # Returns: (unit_price, material_cost, wage_per_piece)
+        
+        # Default (Low complexity)
+        unit = 100_000
+        material = 60_000
+        wage = 30_000
+        
+        # Adjust based on Category
+        if clothes_category == "Custom":
+            unit = 350_000
+            material = 150_000
+            wage = 100_000
+        
+        # Adjust based on key types
+        typ = str(clothes_type).lower()
+        if "jacket" in typ:
+            unit += 150_000
+            material += 80_000
+            wage += 40_000
+        elif "uniform" in typ:
+             # Uniforms are bulk, slightly lower margin per piece but higher qty
+             if clothes_category != "Custom":
+                 unit = 150_000
+                 material = 90_000
+                 wage = 40_000
+        elif "jersey" in typ:
+            unit = 120_000
+            material = 70_000
+            wage = 35_000
+
+        return unit, material, wage
+
+    projects_map = {}
+    
+    for i, row in df.iterrows():
+        tailor_name = row["Name"]
+        t_id = tailor_id_map.get(tailor_name)
+        
+        qty = int(row["Clothes Assigned"])
+        cat = row["Clothes Category"]
+        typ = row["Clothes Type"]
+        
+        start_date = row["Project Start"]
+        deadline = row["Project Deadline"]
+        
+        # Extra Stats
+        days_needed = row["Time Needed (in days)"]
+        hours_per_piece = row["Working Time per Clothes (in hours)"]
+        
+        # Convert timestamps to date
+        if hasattr(start_date, 'date'): start_date = start_date.date()
+        if hasattr(deadline, 'date'): deadline = deadline.date()
+        
+        # Unique Key for Project
+        # Note: We use string formatting for dates to be safe as dict keys
+        project_key = (cat, typ, str(start_date), str(deadline))
+        
+        # Tailor Assignment Payload
+        tailor_data = {
+            "assigned": qty, 
+            "completed": qty, 
+            "picked_up": True,
+            "days_needed": days_needed,
+            "hours_per_piece": hours_per_piece
+        }
+        
+        if project_key in projects_map:
+            # Existing Project -> Update
+            existing_order = projects_map[project_key]
+>>>>>>> Stashed changes
             
         tailors.append(
             Tailor(

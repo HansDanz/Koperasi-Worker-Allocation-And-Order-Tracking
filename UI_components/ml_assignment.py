@@ -31,10 +31,10 @@ def assign_ml_dialog(order):
             for tid in o.tailors_involved:
                 busy_tailor_ids.add(tid)
                 
-    # 2. Filter: Capacity < Max AND Not Busy
+    # 2. Filter: Not Busy
     available_tailors = [
         t for t in tailors 
-        if t.current_workload < t.max_capacity and t.id not in busy_tailor_ids
+        if t.id not in busy_tailor_ids
     ]
 
 
@@ -52,9 +52,13 @@ def assign_ml_dialog(order):
                     st.progress(normalized_level, text=f"{skill} ({level})")
 
                 st.write(f"Reliability: {tailor.reliability_score}")
+<<<<<<< Updated upstream
                 st.write(
                     f"Workload: {tailor.current_workload}/{tailor.max_capacity}"
                 )
+=======
+
+>>>>>>> Stashed changes
                 st.write(f"Availability: {tailor.availability_hours} hrs")
         st.session_state.selected_tailors.add(tailor.id)
 
@@ -80,7 +84,11 @@ def assign_ml_dialog(order):
             st.rerun()
 
     with col2:
+<<<<<<< Updated upstream
         if st.button("Reject & Choose Manually", use_container_width=True):
+=======
+        if st.button("Reject & Assign Manually", use_container_width=True):
+>>>>>>> Stashed changes
             st.session_state.selected_tailors.clear()
             st.session_state.assignment_mode = "MANUAL"
             st.rerun()

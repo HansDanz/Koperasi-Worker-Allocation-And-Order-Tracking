@@ -40,7 +40,7 @@ def assign_manual_dialog(order):
 
     available_tailors = [
         t for t in tailors
-        if t.current_workload < t.max_capacity and t.id not in busy_tailor_ids
+        if t.id not in busy_tailor_ids
     ]
     
     busy_list = [t for t in tailors if t.id in busy_tailor_ids]
@@ -57,9 +57,7 @@ def assign_manual_dialog(order):
                     st.progress(level, text=skill)
 
                 st.write(f"Reliability: {tailor.reliability_score}")
-                st.write(
-                    f"Workload: {tailor.current_workload}/{tailor.max_capacity}"
-                )
+
                 st.write(f"Availability: {tailor.availability_hours} hrs")
 
             with col2:
