@@ -130,7 +130,8 @@ with tab_overview:
                 fig, ax = plt.subplots(figsize=(5, 4))
                 bars = ax.bar(["Income", "Expenses", "Profit"], 
                        [current_stats['income'], current_stats['expenses'], current_stats['net_profit']], 
-                       color=["#4ade80", "#f87171", "#60a5fa"])
+                       color=["#4ade80", "#f87171", "#60a5fa"],
+                       edgecolor='black', linewidth=1)
                 
                 # Format Y Axis
                 ax.yaxis.set_major_formatter(formatter)
@@ -154,7 +155,8 @@ with tab_overview:
                             labels=["Wages", "Materials/Ops"], 
                             autopct='%1.1f%%', 
                             colors=["#60a5fa", "#fbbf24"],
-                            startangle=90)
+                            startangle=90,
+                            wedgeprops={"edgecolor": "black", "linewidth": 1})
                     st.pyplot(fig2)
                 else:
                     st.info("No expenses recorded.")
@@ -209,7 +211,7 @@ with tab_insights:
                  with c_a:
                      fig3, ax3 = plt.subplots(figsize=(5,3))
                      colors = ["#818cf8", "#34d399", "#fbbf24", "#f87171", "#a78bfa"]
-                     bars3 = ax3.bar(cat_stats.keys(), cat_stats.values(), color=colors[:len(cat_stats)])
+                     bars3 = ax3.bar(cat_stats.keys(), cat_stats.values(), color=colors[:len(cat_stats)], edgecolor='black', linewidth=1)
                      ax3.set_title("Net Profit (IDR)")
                      
                      ax3.yaxis.set_major_formatter(formatter)
@@ -271,7 +273,7 @@ with tab_payroll:
                     wages = list(sorted_earnings.values())[:5]
                     
                     y_pos = range(len(names))
-                    ax_w.barh(y_pos, wages, align='center', color="#f472b6")
+                    ax_w.barh(y_pos, wages, align='center', color="#f472b6", edgecolor='black', linewidth=1)
                     ax_w.set_yticks(y_pos)
                     ax_w.set_yticklabels(names)
                     ax_w.invert_yaxis()  # labels read top-to-bottom

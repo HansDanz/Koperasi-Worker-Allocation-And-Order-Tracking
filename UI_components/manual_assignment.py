@@ -54,7 +54,12 @@ def assign_manual_dialog(order):
             with col1:
                 st.write("**Skills**")
                 for skill, level in tailor.skill_vector.items():
-                    st.progress(level, text=skill)
+                    if isinstance(level, (int, float)):
+                        # Skills are 1-10, progress expects 0.0-1.0
+                        normalized_level = min(max(level / 10.0, 0.0), 1.0)
+                        st.progress(normalized_level, text=f"{skill} ({level})")
+                    else:
+                        st.write(f"**{skill.capitalize()}:** {level}")
 
                 st.write(f"Reliability: {tailor.reliability_score}")
                 st.write(

@@ -3,6 +3,7 @@ from utils.style_utils import render_tailwind
 from UI_components.qc_dialog import update_progress_dialog
 from models.order import Order
 from UI_components.ml_assignment import assign_ml_dialog
+from UI_components.confirmation_dialog import confirm_advance_dialog
 
 @st.dialog("Finalize Order Completion")
 def complete_order_dialog(order):
@@ -181,9 +182,7 @@ def render_order_detail(order, tailor_lookup):
                     
             else:
                 if st.button(f"Next Stage: {target_stage} ➡️", key=f"detail_next_{order.id}", type="primary"):
-                    if order.advance_status():
-                        st.session_state.detail_order_id = None 
-                        st.rerun()
+                    confirm_advance_dialog(order, target_stage)
 
     # Back Button (Styled Red via CSS injection below)
     # Inject CSS specific for the Back button (which is rendered last)

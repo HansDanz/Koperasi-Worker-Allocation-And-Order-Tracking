@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.style_utils import render_tailwind
 from UI_components.qc_dialog import update_progress_dialog
+from UI_components.confirmation_dialog import confirm_advance_dialog
 from models.order import Order
 
 
@@ -148,8 +149,7 @@ def render_order_card(order, tailor_lookup, trigger_rerun=None):
                               formatted_stage = target_stage.replace("_", " ").title()
                               # Primary button for Next
                               if st.button(f"Next: {formatted_stage}", key=f"adv_{order.id}", type="primary", use_container_width=True):
-                                  if order.advance_status():
-                                      st.rerun()
+                                  confirm_advance_dialog(order, formatted_stage)
 
         with c2:
              if st.button("Details", key=f"manage_{order.id}", use_container_width=True):
